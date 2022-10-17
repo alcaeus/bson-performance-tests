@@ -3,7 +3,8 @@
     "type": "project",
     "require": {
         "php": "^8.2",
-        "ext-mongodb": "1.15.0-dev"
+        "ext-mongodb": "1.15.0-dev",
+        "mongodb/mongodb": "1.14.x-dev"
     },
     "require-dev": {
         "phpbench/phpbench": "1.2.x-dev"

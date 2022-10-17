@@ -5,6 +5,8 @@ namespace Alcaeus\BsonPerformanceTests\Benchmark;
 use Alcaeus\BsonPerformanceTests\Document\EmbeddedDocument;
 use Alcaeus\BsonPerformanceTests\Document\RootDocument;
 use MongoDB\BSON\BSON;
+use MongoDB\Model\BSONArray;
+use MongoDB\Model\BSONDocument;
 
 final class TypeMapBench extends BaseBench
 {
@@ -23,6 +25,12 @@ final class TypeMapBench extends BaseBench
             'embedded' => EmbeddedDocument::class,
             'documentArray.$' => EmbeddedDocument::class,
         ],
+    ];
+
+    private const TYPEMAP_LIBRARY_DEFAULT = [
+        'array' => BSONArray::class,
+        'document' => BSONDocument::class,
+        'root' => BSONDocument::class,
     ];
 
     public function benchUseDefaultTypeMap(): void
@@ -53,5 +61,10 @@ final class TypeMapBench extends BaseBench
     public function benchUseDocumentFieldPathsTypeMap(): void
     {
         $this->bson->toPHP(self::TYPEMAP_DOCUMENT_CLASS_FIELD_PATHS);
+    }
+
+    public function benchUseLibraryDefaultTypeMap(): void
+    {
+        $this->bson->toPHP(self::TYPEMAP_LIBRARY_DEFAULT);
     }
 }
