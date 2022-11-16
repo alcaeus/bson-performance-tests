@@ -43,6 +43,11 @@ class MarshalBench extends BaseBench
         $this->rootDocumentHydrator->hydrate($this->bson->toPHP(self::TYPEMAP_ARRAY));
     }
 
+    public function benchDoctrineWithBSON(): void
+    {
+        $this->rootDocumentHydrator->hydrateFromBSON($this->bson);
+    }
+
     public function benchIteratorMarshalling(): void
     {
         $this->rootDocumentMarshaller->marshalUsingIterator($this->bson);
