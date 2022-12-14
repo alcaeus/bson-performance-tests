@@ -2,7 +2,7 @@
 
 namespace Alcaeus\BsonPerformanceTests\Benchmark;
 
-use MongoDB\BSON\BSON;
+use MongoDB\BSON\Document;
 use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\UTCDateTime;
 
@@ -19,7 +19,7 @@ abstract class BaseBench
         'array' => 'array',
     ];
 
-    protected BSON $bson;
+    protected Document $bson;
 
     public function init(): void
     {
@@ -31,12 +31,13 @@ abstract class BaseBench
         $document = [
             '_id' => new ObjectId(),
             'embedded' => $embedded,
-            'intArray' => range(0, 10000),
+            'intArray' => range(0, 9999),
             'stringArray' => array_fill(0, 10000, 'foo'),
             'dateTimeArray' => array_fill(0, 10000, new UTCDateTime(0)),
             'documentArray' => array_fill(0, 10000, $embedded),
+            'unusedDocumentArray' => array_fill(0, 10000, $embedded),
         ];
 
-        $this->bson = BSON::fromPHP($document);
+        $this->bson = Document::fromPHP($document);
     }
 }

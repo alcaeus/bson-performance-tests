@@ -4,10 +4,13 @@
     "require": {
         "php": "^8.2",
         "ext-mongodb": "1.15.0-dev",
-        "mongodb/mongodb": "1.14.x-dev"
+        "mongodb/mongodb": "1.14.x-dev",
+        "symfony/var-exporter": "6.2.x-dev",
+        "doctrine/collections": "3.0.x-dev"
     },
     "require-dev": {
-        "phpbench/phpbench": "1.2.x-dev"
+        "phpbench/phpbench": "1.2.x-dev",
+        "phpunit/phpunit": "10.0.x-dev"
     },
     "license": "MIT",
     "authors": [
@@ -19,5 +22,8 @@
     "minimum-stability": "dev",
     "autoload": {
         "psr-4": { "Alcaeus\\BsonPerformanceTests\\": "src" }
+    },
+    "autoload-dev": {
+        "psr-4": { "Alcaeus\\BsonPerformanceTests\\Tests\\": "tests" }
     }
 }

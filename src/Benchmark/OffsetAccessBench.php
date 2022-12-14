@@ -4,14 +4,13 @@ namespace Alcaeus\BsonPerformanceTests\Benchmark;
 
 use Alcaeus\BsonPerformanceTests\Document\EmbeddedDocument;
 use Alcaeus\BsonPerformanceTests\Document\RootDocument;
-use MongoDB\BSON\BSON;
+use Generator;
 use MongoDB\Model\BSONArray;
 use MongoDB\Model\BSONDocument;
+use PhpBench\Attributes\ParamProviders;
 
 final class OffsetAccessBench extends BaseBench
 {
-    private const TYPEMAP_BSON = ['root' => 'bson'];
-
     private const TYPEMAP_BSON_EMBEDDED = ['document' => 'bson'];
 
     private const TYPEMAP_DOCUMENT_CLASS = [
@@ -33,30 +32,40 @@ final class OffsetAccessBench extends BaseBench
         'root' => BSONDocument::class,
     ];
 
-    public function benchOffsetWithDefaultTypemap(): void
+    public function provideTypemap(): Generator
     {
-        $data = $this->bson->toPHP();
-        $value = $data->documentArray;
+        yield 'Default' => ['typeMap' => []];
+        yield 'BSON for embedded documents' => ['typeMap' => self::TYPEMAP_BSON_EMBEDDED];
+        yield 'Persistable objects' => ['typeMap' => self::TYPEMAP_DOCUMENT_CLASS];
+        yield 'Persistable objects (field paths)' => ['typeMap' => self::TYPEMAP_DOCUMENT_CLASS_FIELD_PATHS];
+        yield 'Library default' => ['typeMap' => self::TYPEMAP_LIBRARY_DEFAULT];
     }
 
-    public function benchOffsetWithArraysAsBSON(): void
+    #[ParamProviders('provideTypemap')]
+    public function benchOffset(array $params): void
     {
-        $data = $this->bson->toPHP(['array' => 'bson', 'document' => 'bson']);
-        $value = $data->documentArray;
+        $data = $this->bson->toPHP(...$params);
+        $data->documentArray;
     }
 
-    public function benchOffsetWithIterator(): void
+    public function benchOffsetArray(): void
+    {
+        $data = $this->bson->toPHP(self::TYPEMAP_ARRAY);
+        $data['documentArray'];
+    }
+
+    public function benchOffsetBSON(): void
+    {
+        $this->bson->get('documentArray');
+    }
+
+    public function benchOffsetBSONIterator(): void
     {
         foreach ($this->bson as $key => $value) {
             if ($key == 'documentArray') {
-                $foundValue = $value;
+                $value;
                 return;
             }
         }
-    }
-
-    public function benchOffsetDirectlyFromBSON(): void
-    {
-        $value = $this->bson->get('documentArray');
     }
 }

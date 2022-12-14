@@ -4,7 +4,7 @@ namespace Alcaeus\BsonPerformanceTests\Hydrator;
 
 use Alcaeus\BsonPerformanceTests\Document\EmbeddedDocument;
 use Alcaeus\BsonPerformanceTests\Document\RootDocument;
-use MongoDB\BSON\BSON;
+use MongoDB\BSON\Document;
 
 final class RootDocumentHydrator
 {
@@ -29,7 +29,7 @@ final class RootDocumentHydrator
         return $rootDocument;
     }
 
-    public function hydrateFromBSON(BSON $data): RootDocument
+    public function hydrateFromBSON(Document $data): RootDocument
     {
         $rootDocument = new RootDocument();
 
@@ -39,7 +39,7 @@ final class RootDocumentHydrator
         $rootDocument->stringArray = $data->get('stringArray')->toPHP();
         $rootDocument->dateTimeArray = $data->get('dateTimeArray')->toPHP();
         $rootDocument->documentArray = array_map(
-            fn (BSON $embeddedData): EmbeddedDocument => $this->embeddedDocumentHydrator->hydrateFromBSON($embeddedData),
+            fn (Document $embeddedData): EmbeddedDocument => $this->embeddedDocumentHydrator->hydrateFromBSON($embeddedData),
             $data->get('documentArray')->toPHP(['document' => 'bson'])
         );
 

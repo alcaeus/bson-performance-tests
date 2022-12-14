@@ -4,7 +4,7 @@ namespace Alcaeus\BsonPerformanceTests\Marshaller;
 
 use Alcaeus\BsonPerformanceTests\Document\EmbeddedDocument;
 use Alcaeus\BsonPerformanceTests\Document\RootDocument;
-use MongoDB\BSON\BSON;
+use MongoDB\BSON\Document;
 
 final class RootDocumentMarshaller
 {
@@ -12,7 +12,7 @@ final class RootDocumentMarshaller
         private EmbeddedDocumentMarshaller $embeddedDocumentMarshaller,
     ) {}
 
-    public function marshalUsingIterator(BSON $data): RootDocument
+    public function marshalUsingIterator(Document $data): RootDocument
     {
         $rootDocument = new RootDocument();
 
@@ -34,7 +34,7 @@ final class RootDocumentMarshaller
 
                 case 'documentArray':
                     $rootDocument->documentArray = array_map(
-                        fn (BSON $embeddedData): EmbeddedDocument => $this->embeddedDocumentMarshaller->marshalUsingIterator($embeddedData),
+                        fn (Document $embeddedData): EmbeddedDocument => $this->embeddedDocumentMarshaller->marshalUsingIterator($embeddedData),
                         $value->toPHP(['document' => 'bson']),
                     );
             }
@@ -43,7 +43,7 @@ final class RootDocumentMarshaller
         return $rootDocument;
     }
 
-    public function marshalUsingArray(BSON $data): RootDocument
+    public function marshalUsingArray(Document $data): RootDocument
     {
         $rootDocument = new RootDocument();
 
@@ -57,8 +57,27 @@ final class RootDocumentMarshaller
         $rootDocument->dateTimeArray = $dataArray['dateTimeArray'];
 
         $rootDocument->documentArray = array_map(
-            fn (BSON $embeddedData): EmbeddedDocument => $this->embeddedDocumentMarshaller->marshalUsingArray($embeddedData),
+            fn (Document $embeddedData): EmbeddedDocument => $this->embeddedDocumentMarshaller->marshalUsingArray($embeddedData),
             $dataArray['documentArray'],
+        );
+
+        return $rootDocument;
+    }
+
+    public function marshalUsingGet(Document $data): RootDocument
+    {
+        $rootDocument = new RootDocument();
+
+        $rootDocument->id = $data->get('_id');
+
+        $rootDocument->embedded = $this->embeddedDocumentMarshaller->marshalUsingIterator($data->get('embedded'));
+        $rootDocument->intArray = $data->get('intArray')->toPHP();
+        $rootDocument->stringArray = $data->get('stringArray')->toPHP();
+        $rootDocument->dateTimeArray = $data->get('dateTimeArray')->toPHP();
+
+        $rootDocument->documentArray = array_map(
+            fn (Document $embeddedData): EmbeddedDocument => $this->embeddedDocumentMarshaller->marshalUsingGet($embeddedData),
+            $data->get('documentArray')->toPHP(['document' => 'bson']),
         );
 
         return $rootDocument;

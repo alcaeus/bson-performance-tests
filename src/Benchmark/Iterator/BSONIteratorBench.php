@@ -2,8 +2,8 @@
 
 namespace Alcaeus\BsonPerformanceTests\Benchmark\Iterator;
 
-use MongoDB\BSON\BSON;
-use MongoDB\BSON\BSONIterator;
+use MongoDB\BSON\ArrayList;
+use MongoDB\BSON\Iterator;
 use PhpBench\Attributes\BeforeMethods;
 use function iterator_to_array;
 
@@ -11,18 +11,12 @@ use function iterator_to_array;
 final class BSONIteratorBench
 {
     private array $array;
-    private BSON $bson;
+    private ArrayList $arrayList;
 
     public function init(): void
     {
-        $bson = BSON::fromPHP([
-            'asBson' => range(0, 10000),
-            'asArray' => range(0, 10000),
-        ]);
-
-        $converted = $bson->toPHP(['array' => 'array', 'fieldPaths' => ['asBson' => 'bson']]);
-        $this->array = $converted->asArray;
-        $this->bson = $converted->asBson;
+        $this->array = range(0, 10000);
+        $this->arrayList = ArrayList::fromPHP($this->array);
     }
 
     public function benchIterateOverArray(): void
@@ -32,11 +26,11 @@ final class BSONIteratorBench
 
     public function benchIterateOverBson(): void
     {
-        foreach ($this->bson as $key => $value) {}
+        foreach ($this->arrayList as $key => $value) {}
     }
 
     public function benchIterateOverConvertedIterator(): void
     {
-        foreach (iterator_to_array($this->bson) as $key => $value) {}
+        foreach (iterator_to_array($this->arrayList) as $key => $value) {}
     }
 }

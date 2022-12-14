@@ -3,11 +3,11 @@
 namespace Alcaeus\BsonPerformanceTests\Marshaller;
 
 use Alcaeus\BsonPerformanceTests\Document\EmbeddedDocument;
-use MongoDB\BSON\BSON;
+use MongoDB\BSON\Document;
 
 final class EmbeddedDocumentMarshaller
 {
-    public function marshalUsingIterator(BSON $data): EmbeddedDocument
+    public function marshalUsingIterator(Document $data): EmbeddedDocument
     {
         $embeddedDocument = new EmbeddedDocument();
 
@@ -22,12 +22,23 @@ final class EmbeddedDocumentMarshaller
 
         return $embeddedDocument;
     }
-    public function marshalUsingArray(BSON $data): EmbeddedDocument
+
+    public function marshalUsingArray(Document $data): EmbeddedDocument
     {
         $embeddedDocument = new EmbeddedDocument();
 
         $arrayData = $data->toPHP(['root' => 'array']);
         $embeddedDocument->bsonUnserialize($arrayData);
+
+        return $embeddedDocument;
+    }
+
+    public function marshalUsingGet(Document $data): EmbeddedDocument
+    {
+        $embeddedDocument = new EmbeddedDocument();
+
+        $embeddedDocument->foo = $data->get('foo');
+        $embeddedDocument->baz = $data->get('baz');
 
         return $embeddedDocument;
     }

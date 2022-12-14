@@ -3,7 +3,7 @@
 namespace Alcaeus\BsonPerformanceTests\Hydrator;
 
 use Alcaeus\BsonPerformanceTests\Document\EmbeddedDocument;
-use MongoDB\BSON\BSON;
+use MongoDB\BSON\Document;
 
 final class EmbeddedDocumentHydrator
 {
@@ -17,7 +17,7 @@ final class EmbeddedDocumentHydrator
         return $embeddedDocument;
     }
 
-    public function hydrateFromBSON(BSON $data): EmbeddedDocument
+    public function hydrateFromBSON(Document $data): EmbeddedDocument
     {
         $embeddedDocument = new EmbeddedDocument();
 

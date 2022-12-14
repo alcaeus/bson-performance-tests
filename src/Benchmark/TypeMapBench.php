@@ -4,9 +4,10 @@ namespace Alcaeus\BsonPerformanceTests\Benchmark;
 
 use Alcaeus\BsonPerformanceTests\Document\EmbeddedDocument;
 use Alcaeus\BsonPerformanceTests\Document\RootDocument;
-use MongoDB\BSON\BSON;
+use Generator;
 use MongoDB\Model\BSONArray;
 use MongoDB\Model\BSONDocument;
+use PhpBench\Attributes\ParamProviders;
 
 final class TypeMapBench extends BaseBench
 {
@@ -33,38 +34,20 @@ final class TypeMapBench extends BaseBench
         'root' => BSONDocument::class,
     ];
 
-    public function benchUseDefaultTypeMap(): void
+    public function provideTypemap(): Generator
     {
-        $this->bson->toPHP();
+        yield 'Default' => ['typeMap' => []];
+        yield 'Array' => ['typeMap' => self::TYPEMAP_ARRAY];
+        yield 'BSON' => ['typeMap' => self::TYPEMAP_BSON];
+        yield 'BSON for embedded documents' => ['typeMap' => self::TYPEMAP_BSON_EMBEDDED];
+        yield 'Persistable objects' => ['typeMap' => self::TYPEMAP_DOCUMENT_CLASS];
+        yield 'Persistable objects (field paths)' => ['typeMap' => self::TYPEMAP_DOCUMENT_CLASS_FIELD_PATHS];
+        yield 'Library default' => ['typeMap' => self::TYPEMAP_LIBRARY_DEFAULT];
     }
 
-    public function benchUseArrayTypeMap(): void
+    #[ParamProviders('provideTypemap')]
+    public function benchToPHP(array $params): void
     {
-        $this->bson->toPHP(self::TYPEMAP_ARRAY);
-    }
-
-    public function benchUseBsonTypeMap(): void
-    {
-        $this->bson->toPHP(self::TYPEMAP_BSON);
-    }
-
-    public function benchUseBsonEmbeddedTypeMap(): void
-    {
-        $this->bson->toPHP(self::TYPEMAP_BSON_EMBEDDED);
-    }
-
-    public function benchUseDocumentTypeMap(): void
-    {
-        $this->bson->toPHP(self::TYPEMAP_DOCUMENT_CLASS);
-    }
-
-    public function benchUseDocumentFieldPathsTypeMap(): void
-    {
-        $this->bson->toPHP(self::TYPEMAP_DOCUMENT_CLASS_FIELD_PATHS);
-    }
-
-    public function benchUseLibraryDefaultTypeMap(): void
-    {
-        $this->bson->toPHP(self::TYPEMAP_LIBRARY_DEFAULT);
+        $this->bson->toPHP(...$params);
     }
 }
